@@ -1,5 +1,4 @@
 class TimeFormatter
-  # attr_reader :unknown_params, :time_params
 
   TIME_FORMAT = {
     'year' => '%Y',
@@ -14,7 +13,6 @@ class TimeFormatter
     format_params = URI.decode_www_form(query_string).to_h['format'] || ''
     @time_params = format_params.split(',').map(&:strip).map(&:downcase).uniq
     @unknown_params = @time_params - TIME_FORMAT.keys
-    # @unknown_params = time_params - TIME_FORMAT.keys
   end
 
   def time_string
