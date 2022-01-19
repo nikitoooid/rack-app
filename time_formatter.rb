@@ -9,21 +9,31 @@ class TimeFormatter
     'second' => '%S'
   }.freeze
 
-  def call(query_string)
-    format_params = URI.decode_www_form(query_string).to_h['format'] || ''
-    @time_params = format_params.split(',').map(&:strip).map(&:downcase).uniq
-    @unknown_params = @time_params - TIME_FORMAT.keys
+  def call(format_params)
+    @time_params = []
+    @unknown_params = []
+    format_params.split(',').uniq.each{ |p| filter_param(p.strip.downcase) } unless format_params.nil?
   end
 
   def time_string
-    Time.now.strftime(@time_params.map { |param| TIME_FORMAT[param] }.compact.join('-'))
+    Time.now.strftime(@time_params.join('-'))
   end
 
   def invalid_string
-    @time_params.any? ? "Unknown time format #{@unknown_params}!" : "Not found format params!"
+    "Unknown time format #{@unknown_params}!"
   end
 
   def success?
-    @time_params.any? && @unknown_params.empty?
+    @unknown_params.empty?
+  end
+
+  private
+
+  def filter_param(param)
+    if TIME_FORMAT[param]
+      @time_params << TIME_FORMAT[param]
+    else
+      @unknown_params << param
+    end
   end
 end

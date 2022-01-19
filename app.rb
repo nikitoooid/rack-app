@@ -5,8 +5,10 @@ class App
   HEADERS = { "Content-Type" => "text/plain" }
 
   def call(env)
+    req = Rack::Request.new(env)
+
     if env["PATH_INFO"] == '/time'
-      prepare_response(env["QUERY_STRING"])
+      prepare_response(req.params['format'])
     else
       response(404, "Not found")
     end
@@ -14,9 +16,9 @@ class App
 
   private
 
-  def prepare_response(query_string)
+  def prepare_response(params)
     time_formatter = TimeFormatter.new
-    time_formatter.call(query_string)
+    time_formatter.call(params)
 
     if time_formatter.success?
       response(200, time_formatter.time_string)
